@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://cyauafu6sfp2e"]
+[gd_scene load_steps=6 format=3 uid="uid://cyauafu6sfp2e"]
 
 [ext_resource type="Script" uid="uid://4j7154vvy68t" path="res://game.gd" id="1_80nbo"]
+[ext_resource type="Script" uid="uid://37lc8rflfqo6" path="res://fightButton.gd" id="2_e2o6t"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mwb40"]
 bg_color = Color(0.270409, 0.240153, 0.227002, 0.831373)
@@ -40,12 +41,12 @@ theme_override_constants/margin_bottom = 20
 layout_mode = 2
 theme_override_constants/separation = 15
 
-[node name="BANNER" type="PanelContainer" parent="Background/MarginContainer/Rows"]
+[node name="banner_background" type="PanelContainer" parent="Background/MarginContainer/Rows"]
 custom_minimum_size = Vector2(0, 74)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_80nbo")
 
-[node name="banner_text" type="Label" parent="Background/MarginContainer/Rows/BANNER"]
+[node name="BANNER" type="Label" parent="Background/MarginContainer/Rows/banner_background"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "FACTION ENCOUNTER"
@@ -53,42 +54,41 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
+[node name="spacer_lg" type="HBoxContainer" parent="Background/MarginContainer/Rows"]
+visible = false
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+theme_override_constants/separation = 2
+
 [node name="desc" type="PanelContainer" parent="Background/MarginContainer/Rows"]
 custom_minimum_size = Vector2(0, 250)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_e2o6t")
 
-[node name="desc_text" type="Label" parent="Background/MarginContainer/Rows/desc"]
+[node name="desc_text" type="RichTextLabel" parent="Background/MarginContainer/Rows/desc"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-size_flags_vertical = 1
+bbcode_enabled = true
 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
 horizontal_alignment = 1
 vertical_alignment = 1
-autowrap_mode = 3
-text_overrun_behavior = 2
 
 [node name="spacer" type="HBoxContainer" parent="Background/MarginContainer/Rows"]
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="spacer_lg" type="HBoxContainer" parent="Background/MarginContainer/Rows"]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Background/MarginContainer/Rows"]
+[node name="upper_row" type="VBoxContainer" parent="Background/MarginContainer/Rows"]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme_override_constants/separation = 15
 
-[node name="Button" type="Button" parent="Background/MarginContainer/Rows/VBoxContainer"]
+[node name="FIGHT" type="Button" parent="Background/MarginContainer/Rows/upper_row"]
 layout_mode = 2
 size_flags_vertical = 3
+script = ExtResource("2_e2o6t")
 
-[node name="Label" type="Label" parent="Background/MarginContainer/Rows/VBoxContainer/Button"]
+[node name="Label" type="Label" parent="Background/MarginContainer/Rows/upper_row/FIGHT"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -101,22 +101,22 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="Background/MarginContainer/Rows"]
+[node name="lower_row" type="HBoxContainer" parent="Background/MarginContainer/Rows"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 15
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Background/MarginContainer/Rows/HBoxContainer3"]
+[node name="column_left" type="VBoxContainer" parent="Background/MarginContainer/Rows/lower_row"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 15
 
-[node name="Button2" type="Button" parent="Background/MarginContainer/Rows/HBoxContainer3/VBoxContainer"]
+[node name="SABATOGE" type="Button" parent="Background/MarginContainer/Rows/lower_row/column_left"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label2" type="Label" parent="Background/MarginContainer/Rows/HBoxContainer3/VBoxContainer/Button2"]
+[node name="Label1" type="Label" parent="Background/MarginContainer/Rows/lower_row/column_left/SABATOGE"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -129,11 +129,11 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="Button4" type="Button" parent="Background/MarginContainer/Rows/HBoxContainer3/VBoxContainer"]
+[node name="STEAL" type="Button" parent="Background/MarginContainer/Rows/lower_row/column_left"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label3" type="Label" parent="Background/MarginContainer/Rows/HBoxContainer3/VBoxContainer/Button4"]
+[node name="Label3" type="Label" parent="Background/MarginContainer/Rows/lower_row/column_left/STEAL"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -146,16 +146,16 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="Background/MarginContainer/Rows/HBoxContainer3"]
+[node name="column_right" type="VBoxContainer" parent="Background/MarginContainer/Rows/lower_row"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 15
 
-[node name="Button2" type="Button" parent="Background/MarginContainer/Rows/HBoxContainer3/VBoxContainer2"]
+[node name="NEGOTIATE" type="Button" parent="Background/MarginContainer/Rows/lower_row/column_right"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label4" type="Label" parent="Background/MarginContainer/Rows/HBoxContainer3/VBoxContainer2/Button2"]
+[node name="Label4" type="Label" parent="Background/MarginContainer/Rows/lower_row/column_right/NEGOTIATE"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -168,11 +168,11 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="Button4" type="Button" parent="Background/MarginContainer/Rows/HBoxContainer3/VBoxContainer2"]
+[node name="FLEE" type="Button" parent="Background/MarginContainer/Rows/lower_row/column_right"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label5" type="Label" parent="Background/MarginContainer/Rows/HBoxContainer3/VBoxContainer2/Button4"]
+[node name="Label5" type="Label" parent="Background/MarginContainer/Rows/lower_row/column_right/FLEE"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -184,3 +184,5 @@ text = "FLEE"
 horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
+
+[connection signal="pressed" from="Background/MarginContainer/Rows/upper_row/FIGHT" to="." method="_on_fight_pressed"]

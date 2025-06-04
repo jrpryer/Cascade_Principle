@@ -1,9 +1,10 @@
 # Faction State Manager
-class_name Faction
+class_name FactionClass
 extends Resource
 
-# Enums for cleaner state management
-enum Leadership { CENTRALIZED, FRACTURED, COMPETING, INFILTRATED }
+# Enums for cleaner state management"
+enum KnownFactions { IMPERIAL, REBEL, CIVILIAN, GUILD, MANDOLORIAN }
+enum Leadership { CENTRALIZED, FRACTURED, INFILTRATED, COMPETING }
 enum Doctrine { DIPLOMACY, SURVEILLANCE, MOBILIZATION, OCCUPATION }
 enum Stability { HIGH, MEDIUM, LOW, COLLAPSED }
 enum Morale { CONFIDENT, PARANOID, RALLIED, INFIGHTING }
@@ -13,10 +14,11 @@ enum Morale { CONFIDENT, PARANOID, RALLIED, INFIGHTING }
 @export var primary_doctrine: Doctrine = Doctrine.DIPLOMACY
 @export var stability_level: Stability = Stability.HIGH
 @export var morale_state: Morale = Morale.CONFIDENT
+var last_events: Array[logEvent]
 
 # Doctrine intensities (0-10 scale)
-@export var doctrine_intensities = {
-	Doctrine.DIPLOMACY: 5,
+@export var doctrine_strength = {
+	Doctrine.DIPLOMACY: 3,
 	Doctrine.SURVEILLANCE: 2,
 	Doctrine.MOBILIZATION: 1,
 	Doctrine.OCCUPATION: 0
@@ -36,8 +38,54 @@ class Subfaction:
 		name = subfaction_name
 		influence = subfaction_influence
 		methodology = subfaction_method
+		
+	func describe() -> String:
+		return "    Subfaction: %s, Influence: %.2f, Methodology: %s\n" % [
+			name, influence, FactionClass.Doctrine.keys()[methodology]]
+	
+	func generate_summary_text() -> String:
+		return "    ▸ [b]%s[/b] (Influence: %.2f, Methodology: %s)\n" % [
+			name, influence, FactionClass.Doctrine.keys()[methodology]
+	]
 
 var subfactions: Array[Subfaction] = []
+
+func update_primary_doctrine_from_strengths() -> void:
+	var max_strength := -1
+	var dominant := Doctrine.DIPLOMACY  # fallback
+
+	for doctrine in doctrine_strength:
+		var strength = doctrine_strength[doctrine]
+		if strength > max_strength:
+			max_strength = strength
+			dominant = doctrine
+
+	primary_doctrine = dominant
+
+
+
+func describe() -> String:
+	var desc = "Faction: %s\n Leadership: %s\n Doctrine: %s\n Stability: %s\n Morale: %s\n" % [
+		faction_name, Leadership.keys()[leadership_state], Doctrine.keys()[primary_doctrine],
+		Stability.keys()[stability_level], Morale.keys()[morale_state]]
+	desc += "  Doctrine Strengths:\n"
+	
+	for doctrine_enum in doctrine_strength:
+		var name = Doctrine.keys()[doctrine_enum]
+		var strength = doctrine_strength[doctrine_enum]
+		desc += "    - %s: %d\n" % [name, strength]
+	
+	desc += "  Occupied Regions:\n"
+	for region in occupied_regions:
+		desc += "    - %s: %d\n" % [region, occupied_regions[region]]
+
+	for sub in subfactions:
+		desc += sub.describe()
+
+	return desc
+
+
+
 
 # State transition methods
 func fracture_leadership():
@@ -63,15 +111,15 @@ func _create_competing_subfactions():
 
 func escalate_doctrine(doctrine: Doctrine, intensity: int):
 	"""Increase doctrine intensity, potentially shifting primary focus"""
-	doctrine_intensities[doctrine] = mini(10, doctrine_intensities[doctrine] + intensity)
+	doctrine_strength[doctrine] = mini(10, doctrine_strength[doctrine] + intensity)
 	
 	# Check if this becomes the new primary doctrine
 	var highest_intensity = 0
 	var dominant_doctrine = primary_doctrine
 	
-	for doc in doctrine_intensities:
-		if doctrine_intensities[doc] > highest_intensity:
-			highest_intensity = doctrine_intensities[doc]
+	for doc in doctrine_strength:
+		if doctrine_strength[doc] > highest_intensity:
+			highest_intensity = doctrine_strength[doc]
 			dominant_doctrine = doc
 	
 	if dominant_doctrine != primary_doctrine:
@@ -89,7 +137,7 @@ func _trigger_doctrine_shift_consequences():
 		Doctrine.MOBILIZATION:
 			morale_state = Morale.RALLIED
 			# Mobilization might fracture leadership if pushed too hard
-			if doctrine_intensities[Doctrine.MOBILIZATION] > 7:
+			if doctrine_strength[Doctrine.MOBILIZATION] > 7:
 				fracture_leadership()
 
 func apply_player_action(action_type: String, severity: int):
@@ -113,9 +161,9 @@ func apply_player_action(action_type: String, severity: int):
 func get_current_state_description() -> String:
 	"Generate text description of current " + faction_name + " state for UI"
 	var desc = faction_name + " Leadership: %s\n" % Leadership.keys()[leadership_state]
-	desc += "Primary Doctrine: %s (Intensity: %d)\n" % [Doctrine.keys()[primary_doctrine], doctrine_intensities[primary_doctrine]]
+	desc += "Primary Doctrine: %s (Intensity: %d)\n" % [Doctrine.keys()[primary_doctrine], doctrine_strength[primary_doctrine]]
 	desc += "Stability: %s\n" % Stability.keys()[stability_level]
-	desc += "Morale: %s\n" % Morale.keys()[morale_state]
+	desc += "Morale: %s\n" % Morale.keys()[morale_state] 
 	
 	if subfactions.size() > 0:
 		desc += "\nActive Subfactions:\n"
@@ -123,3 +171,24 @@ func get_current_state_description() -> String:
 			desc += "- %s (Influence: %.1f, Focus: %s)\n" % [subfaction.name, subfaction.influence, Doctrine.keys()[subfaction.methodology]]
 	
 	return desc
+
+func generate_summary_text() -> String:
+	var text := "[b]Faction:[/b] %s\n [i]Leadership:[/i] %s\n [i]Primary Doctrine:[/i] %s\n [i]Stability:[/i] %s\n [i]Morale:[/i] %s\n" % [
+		faction_name, Leadership.keys()[leadership_state], Doctrine.keys()[primary_doctrine],
+		Stability.keys()[stability_level], Morale.keys()[morale_state]]
+
+	text += "  [u]Doctrine Strengths:[/u]\n"
+	for doctrine_enum in doctrine_strength:
+		var name = Doctrine.keys()[doctrine_enum]
+		var strength = doctrine_strength[doctrine_enum]
+		text += "    • %s: %d\n" % [name, strength]
+
+	text += "  [u]Occupied Regions:[/u]\n"
+	for region in occupied_regions:
+		text += "    • %s: %d\n" % [region, occupied_regions[region]]
+
+	text += "\n  [u]Subfactions:[/u]\n"
+	for sub in subfactions:
+		text += sub.generate_summary_text()
+
+	return text

@@ -12,4 +12,4 @@ enum Action { FIGHT, SABOTAGE, NEGOTIATE, STEAL, FLEE }
 
 func _init():
 	randomize() # Optional: ensure fresh seed
-	name = Global.NAME_POOL[randi() % Global.NAME_POOL.size()]
+	name = GlobalData.NAME_POOL[randi() % GlobalData.NAME_POOL.size()]

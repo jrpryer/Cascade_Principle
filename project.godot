@@ -11,12 +11,13 @@ config_version=5
 [application]
 
 config/name="Cascade_Principle"
+run/main_scene="uid://cyauafu6sfp2e"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-Global="*res://Global.gd"
+GlobalData="*res://globalData.gd"
 
 [rendering]
 
